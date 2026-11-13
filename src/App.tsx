@@ -227,7 +227,6 @@ function App() {
           <section className="workspace-section">
             <div className="section-header">
               <p className="section-label">{t("app.section_account")}</p>
-              {/* here to ensure spacing and stuff is correct */}
               <span className="section-hint placeholder" aria-hidden="true">
                 Placeholder
               </span>
@@ -393,6 +392,21 @@ function App() {
                   }}
                 >
                   {t("app.import_ipa")}
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!ensureSelectedDevice()) return;
+                    try {
+                      toast.info("Подключение к MobileBackup2...");
+                      await invoke("apply_nugget_tweaks");
+                      toast.success("Успешно подключено к службе бэкапов!");
+                    } catch (e: any) {
+                      console.error(e);
+                      toast.error("Ошибка: " + (e?.message || JSON.stringify(e)));
+                    }
+                  }}
+                >
+                  Apply Nugget Tweaks
                 </button>
               </div>
             </GlassCard>
