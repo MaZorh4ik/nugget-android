@@ -8,6 +8,7 @@ mod sideload;
 mod pairing;
 #[macro_use]
 mod secure_storage;
+mod nugget;
 #[cfg(target_os = "android")]
 mod android_usbmuxd;
 mod error;
@@ -28,13 +29,13 @@ use crate::{
     },
     secure_storage::{force_disable_keyring, keyring_available},
     sideload::{SideloaderMutex, install_sidestore_operation, sideload_operation},
+    nugget::apply_nugget_tweaks,
 };
 use tauri::Manager;
 use tracing_subscriber::{Layer, Registry, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // On mobile there is no `main`, so process-wide setup has to happen here.
     let _ = rustls::crypto::ring::default_provider().install_default();
     if let Err(e) = isideload::init() {
         eprintln!("Failed to initialize error reporting: {e}");
@@ -144,12 +145,12 @@ pub fn run() {
             force_disable_keyring,
             cancel_pairing,
             has_stored_rppairing,
+            apply_nugget_tweaks,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-/// JNI entry points called from `MainActivity.kt`, which owns Android's USB permission flow.
 #[cfg(target_os = "android")]
 mod android_jni {
     use jni::{
