@@ -5,12 +5,7 @@ description = "User-friendly sideloader"
 authors = ["nab138"]
 edition = "2024"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
-# The `_lib` suffix may seem redundant but it is necessary
-# to make the lib name unique and wouldn't conflict with the bin name.
-# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
 name = "iloader_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
@@ -22,9 +17,7 @@ tauri = { version = "2", features = ["devtools"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# ring instead of the default aws-lc: it cross-compiles to Android with just the NDK.
-idevice = { version = "0.1.68", default-features = false, features = ["ring", "usbmuxd", "house_arrest", "afc", "core_device_proxy", "remote_pairing", "tcp", "tunnel_tcp_stack", "xpc", "rsd", "pair"] }
-# Vendored copy with Android TLS handling, see vendor/isideload/src/util/http.rs.
+idevice = { version = "0.1.68", default-features = false, features = ["ring", "usbmuxd", "house_arrest", "afc", "core_device_proxy", "remote_pairing", "tcp", "tunnel_tcp_stack", "xpc", "rsd", "pair", "mobilebackup2"] }
 isideload = { path = "../vendor/isideload", features = ["fs-storage"] }
 keyring = { version = "3.6.3", features = ["apple-native", "windows-native", "linux-native-sync-persistent"] }
 tauri-plugin-store = "2"
@@ -46,11 +39,12 @@ rootcause = "0.12.1"
 thiserror = "2.0.18"
 strum = {version = "0.28.0", features = ["derive"] }
 uuid = { version = "1", features = ["v4"] }
+rusqlite = { version = "0.32.0", features = ["bundled"] }
+sha1 = "0.10"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
 
 [target.'cfg(target_os = "android")'.dependencies]
-# Pinned to a known commit: the in-process usbmuxd (src/android_usbmuxd.rs) was written against this API.
 nusb = { git = "https://github.com/kevinmehall/nusb", rev = "c46ccd0183844b6299b5354a4a13d6837d5fcf63" }
 jni = "0.21"
